@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css    ">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+        p.item {
+            padding: 16px;
+            text-align: center;
+            border-radius: 8px;
+            color: white;
+            background-color: green;
+        }
+    </style>
+</head>
+
+<body class="bg-secondary">
+
+    <h3 class="text-center my-5 text-light">User Login</h3>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-5">
+                <div class="border p-3 rounded bg-light">
+                    <form method="post" id="form-login">
+                        <div class="form-group">
+                            <label for="user">Email</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                </div>
+                                <input name="email" value="" id="email" type="text" class="form-control"
+                                    placeholder="Email">
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="pass">Password</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                </div>
+                                <input name="password" value="" id="password" type="password" class="form-control"
+                                    placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck" name="example1">
+                                <label class="custom-control-label" for="customCheck">Remember</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div id="loginAlert" class="alert alert-danger alert-dismissible fade">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                Error
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-success px-5" type="submit">Login</button>
+                        </div>
+                        <div class="form-group">
+                            <p>Don't have any account? <a href="/register">Register now!</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+
+<script>
+    const frmLogin = $('#form-login');
+    const loginAlert = $('#loginAlert');
+
+    frmLogin.submit(e => {
+        e.preventDefault()
+
+        let email = $('#email').val();
+        let password = $('#password').val();
+
+        axios.post('/api/account/login', {
+            email,
+            password
+        })
+            .then((result) => {
+                console.log(result)
+                if (result.status === 200) {
+                    let data = result.data;
+                    if (data.code === 1) {
+                        const token = data.token;
+
+                        loginAlert.removeClass('show').addClass('fade');
+
+                        loginAlert.removeClass('alert-danger').addClass('alert-success');
+                        loginAlert.html('<button type="button" class="close" data-dismiss="alert">&times;</button>Registration successful');
+
+                        loginAlert.addClass('show');
+
+                        localStorage.setItem('token', token);
+                        window.location.href = '/chat'
+
+                    }
+                }
+            }).catch((err) => {
+                console.log(err)
+                loginAlert.removeClass('alert-success').addClass('alert-danger');
+                loginAlert.html('<button type="button" class="close" data-dismiss="alert">&times;</button>Error:' + err.response.data.message);
+
+                loginAlert.addClass('show');
+            });
+    })
+
+</script>
